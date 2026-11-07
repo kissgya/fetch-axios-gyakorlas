@@ -19,16 +19,14 @@ export const App = () => {
   const [hiba, setHiba] = useState('');
 
   useEffect(() => {
-    const posztokBetoltese = async () => {
+    (async () => {
       try {
         const response = await axios.get('https://harmadik.sulla.hu/Post');
         setPosztok(response.data);
       } catch (error) {
         setHiba(error.message);
       }
-    };
-
-    posztokBetoltese();
+    })();
   }, []);
 
   return (
