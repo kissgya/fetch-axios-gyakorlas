@@ -1,17 +1,42 @@
-import { Kor } from './Kor';
+import { useState, useEffect } from 'react';
+import './App.css';
 
-export const App = () => {
+const ListaKomponens = ({ elem }) => {
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1>Dobozok helyett körök – Gyakorló</h1>
-      <p>Kattints a körökre a számok növeléséhez!</p>
-      
-      <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-        {/* 3 különböző színű, méretű és kiinduló értékű kör átadása props-ként */}
-        <Kor szin="red" meret={80} kezdoSzam={0} />
-        <Kor szin="blue" meret={120} kezdoSzam={5} />
-        <Kor szin="green" meret={100} kezdoSzam={10} />
+    <div className="container">
+      <div className="row m-5 p-5">
+        <strong>{elem.name}</strong> - {elem.email}<br />
+        {elem.body}
       </div>
     </div>
   );
 };
+
+export const App = () => {
+  const [adat, setAdat] = useState({});
+  const [hiba, setHiba] = useState('');
+  const [id] = useState(500);
+
+  useEffect(() => {
+    // Fetch API hívás .then() / .catch() láncolattal
+    fetch(`https://harmadik.sulla.hu/Comment/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP hiba! Státusz: ${res.status}`);
+        }
+        return res.json(); // A válasz konvertálása JSON objektummá
+      })
+      .then((data) => setAdat(data))
+      .catch((error) => setHiba(error.message));
+  }, [id]);
+
+  return (
+    <div className="container">
+      <div className="row m-5 p-5 border">
+        {hiba ? <p className="text-danger">{hiba}</p> : <ListaKomponens elem={adat} />}
+      </div>
+    </div>
+  );
+};
+
+export default App;
