@@ -4,8 +4,8 @@ import './App.css';
 const ListaKomponens = ({ elem }) => {
   return (
     <div className="container">
-      <div className="row m-5 p-5">
-        <strong>{elem.name}</strong> - {elem.email}<br />
+      <div className="row m-3 p-3 border">
+        <strong>{elem.name}</strong> ({elem.email})<br />
         {elem.body}
       </div>
     </div>
@@ -13,28 +13,32 @@ const ListaKomponens = ({ elem }) => {
 };
 
 export const App = () => {
-  const [adat, setAdat] = useState({});
+  const [adatok, setAdatok] = useState([]);
   const [hiba, setHiba] = useState('');
-  const [id] = useState(500);
 
   useEffect(() => {
-    // Fetch API hívás .then() / .catch() láncolattal
-    fetch(`https://harmadik.sulla.hu/Comment/${id}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP hiba! Státusz: ${res.status}`);
+    const kommentekBetoltese = async () => {
+      try {
+        const response = await fetch('https://harmadik.sulla.hu/Comment');
+        if (!response.ok) {
+          throw new Error(`HTTP hiba: ${response.status}`);
         }
-        return res.json(); // A válasz konvertálása JSON objektummá
-      })
-      .then((data) => setAdat(data))
-      .catch((error) => setHiba(error.message));
-  }, [id]);
+        const data = await response.json();
+        setAdatok(data);
+      } catch (error) {
+        setHiba(error.message);
+      }
+    };
+
+    kommentekBetoltese();
+  }, []);
 
   return (
     <div className="container">
-      <div className="row m-5 p-5 border">
-        {hiba ? <p className="text-danger">{hiba}</p> : <ListaKomponens elem={adat} />}
-      </div>
+      {hiba && <p className="text-danger">{hiba}</p>}
+      {adatok.map((item) => (
+        <ListaKomponens key={item.id} elem={item} />
+      ))}
     </div>
   );
 };
